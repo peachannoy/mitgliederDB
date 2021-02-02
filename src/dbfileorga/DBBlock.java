@@ -13,7 +13,7 @@ public class DBBlock implements Iterable<Record> {
 			
 	/**
 	 * Searches the record with number recNum in the DBBlock. 
-	 * @param  RecNum is the number of Record 1 = first record
+	 * @param  recNum is the number of Record 1 = first record
 	 * @return record with the specified number or null if record was not found 
 	 */
 	public Record getRecord(int recNum){
