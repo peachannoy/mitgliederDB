@@ -1,10 +1,12 @@
-package dbfileorga;
+package dbfileorga.unsorted;
 
 import static org.junit.Assert.*;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import dbfileorga.MitgliederTableAsArray;
+import dbfileorga.Record;
 import org.junit.Before;
 import org.junit.Test;
 

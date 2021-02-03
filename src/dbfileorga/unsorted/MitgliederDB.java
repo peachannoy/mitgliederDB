@@ -1,23 +1,27 @@
-package dbfileorga;
+package dbfileorga.unsorted;
+
+import dbfileorga.DBBlock;
+import dbfileorga.MitgliederTableAsArray;
+import dbfileorga.Record;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class MitgliederDB implements Iterable<Record>
 {
-	
+
 	protected DBBlock db[] = new DBBlock[8];
-	
-	
+
+
 	public MitgliederDB(boolean ordered){
 		this();
 		insertMitgliederIntoDB(ordered);
-		
+
 	}
 	public MitgliederDB(){
 		initDB();
 	}
-	
+
 	private void initDB() {
 		for (int i = 0; i<db.length; ++i){
 			db[i]= new DBBlock();
@@ -102,17 +106,31 @@ public class MitgliederDB implements Iterable<Record>
 	 * @return the record matching the search term
 	 */
 	public Record read(int recNum){
-		//TODO implement
+		if (recNum < 0 || recNum > this.getNumberOfRecords()) { //ungültige Eingaben werden nicht angenommen
+			return null;
+		}
+		for (Record record : this) { //geht anhand des Iterators die DB durch
+			if (recNum<=0) { //recNum bedeutet wie viele Schritte weiter gegangen werden muss
+				return record; //falls recNum==0 also keine schritte weiter, wird der aktuelle record ausgegeben
+			}
+			recNum--; //durch das "einen Schritt weitergehen" verringert sich recNum um eins
+		}
 		return null;
 	}
-	
 	/**
 	 * Returns the number of the first record that matches the search term
 	 * @param searchTerm the term to search for
 	 * @return the number of the record in the DB -1 if not found
 	 */
-	public int findPos(String searchTerm){
-		//TODO implement
+	public int findPos(String searchTerm){ //TODO SearchTerm soll wohl nur die MitgliederNr sein
+		int positionCounter = 0; //aktuelle position wird auf 0 gesetzt
+
+		for (Record record : this) { //DB wird anhand des Iterators durchgegangen
+			if (record.toString().contains(searchTerm)) { //beinhaltet der aktuelle record den Suchbegriff
+				return positionCounter; //wird die aktuelle position ausgegeben
+			}
+			positionCounter++; //ansonsten wird ein Schritt weitergegangen
+		}
 		return -1;
 	}
 	
@@ -122,8 +140,8 @@ public class MitgliederDB implements Iterable<Record>
 	 * @return the record number of the inserted record
 	 */
 	public int insert(Record record){
-		//TODO implement
-		return -1;
+		appendRecord(record);
+		return getNumberOfRecords();
 	}
 	
 	/**
@@ -131,7 +149,19 @@ public class MitgliederDB implements Iterable<Record>
 	 * @param numRecord number of the record to be deleted
 	 */
 	public void delete(int numRecord){
-		//TODO implement
+		int blockNumberWithRecord=getBlockNumOfRecord(numRecord); //suche den Block mit dem enthaltenen Record raus
+		DBBlock temp=db[blockNumberWithRecord]; //Block wird zwischengespeichert
+		String oldRecord= read(numRecord).toString();
+		for(int i=blockNumberWithRecord; i<7 ;i++){
+			db[i]=db[i+1]; //Alle Blöcke werden um eins nach vorne verschoben
+		}
+		db[7]=new DBBlock();
+		for(Record record : temp){
+			System.out.println("Ist "+record.toString() +"gleich "+oldRecord);
+			if(!record.toString().equalsIgnoreCase(oldRecord)){
+				insert(record);
+			}
+		}
 	}
 	
 	/**

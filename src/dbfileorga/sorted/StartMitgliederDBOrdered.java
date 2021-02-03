@@ -1,10 +1,10 @@
-package dbfileorga;
+package dbfileorga.sorted;
 
 public class StartMitgliederDBOrdered {
 
 	public static void main(String[] args) {
 			MitgliederDB db = new MitgliederDB(true);
-			
+			/*
 			System.out.println(db);
 			
 			// TODO test your implementation with the following use cases  
@@ -25,7 +25,7 @@ public class StartMitgliederDBOrdered {
 			db.delete(db.findPos("121"));
 			System.out.println(db);
 			
-			
+			*/
 	}
 
 }

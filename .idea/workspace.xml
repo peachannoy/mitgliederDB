@@ -2,8 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fdb05590-6b18-47e4-8465-819db81ea05b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/dbfileorga/DBBlock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/dbfileorga/DBBlock.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/dbfileorga/sorted/MitgliederDBTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/dbfileorga/unsorted/MitgliederDB.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dbfileorga/MitgliederDB.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/dbfileorga/sorted/MitgliederDB.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dbfileorga/MitgliederDBTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/dbfileorga/unsorted/MitgliederDBTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dbfileorga/MitgliederTableAsArray.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/dbfileorga/MitgliederTableAsArray.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dbfileorga/StartMitgliederDB.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/dbfileorga/unsorted/StartMitgliederDB.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dbfileorga/StartMitgliederDBOrdered.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/dbfileorga/sorted/StartMitgliederDBOrdered.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,12 +37,39 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.0" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="dbfileorga.sorted" />
+      <recent name="dbfileorga" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="StartMitgliederDB" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="dbfileorga.unsorted.StartMitgliederDB" />
+      <module name="dbfileorga" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="dbfileorga.sorted.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.StartMitgliederDB" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -48,6 +82,7 @@
       <option name="presentableId" value="Default" />
       <updated>1612297354732</updated>
       <workItem from="1612297356782" duration="169000" />
+      <workItem from="1612374959893" duration="7370000" />
     </task>
     <servers />
   </component>
@@ -56,5 +91,27 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="371" y="91" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1612387402273">
+      <screen x="0" y="0" width="1280" height="672" />
+    </state>
+    <state x="371" y="91" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1280.672@0.0.1280.672" timestamp="1612387402273" />
+    <state width="1237" height="504" key="GridCell.Tab.0.bottom" timestamp="1612391134760">
+      <screen x="0" y="0" width="1280" height="672" />
+    </state>
+    <state width="1237" height="504" key="GridCell.Tab.0.bottom/0.0.1280.672@0.0.1280.672" timestamp="1612391134760" />
+    <state width="1237" height="504" key="GridCell.Tab.0.center" timestamp="1612391134760">
+      <screen x="0" y="0" width="1280" height="672" />
+    </state>
+    <state width="1237" height="504" key="GridCell.Tab.0.center/0.0.1280.672@0.0.1280.672" timestamp="1612391134760" />
+    <state width="1237" height="504" key="GridCell.Tab.0.left" timestamp="1612391134759">
+      <screen x="0" y="0" width="1280" height="672" />
+    </state>
+    <state width="1237" height="504" key="GridCell.Tab.0.left/0.0.1280.672@0.0.1280.672" timestamp="1612391134759" />
+    <state width="1237" height="504" key="GridCell.Tab.0.right" timestamp="1612391134760">
+      <screen x="0" y="0" width="1280" height="672" />
+    </state>
+    <state width="1237" height="504" key="GridCell.Tab.0.right/0.0.1280.672@0.0.1280.672" timestamp="1612391134760" />
   </component>
 </project>
