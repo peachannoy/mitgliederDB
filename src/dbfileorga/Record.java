@@ -77,7 +77,7 @@ public class Record implements Comparable{
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(Object o) { //new
 		// Identisch check
 		if (this == o)
 			return true;
