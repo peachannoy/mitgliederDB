@@ -1,8 +1,9 @@
 package dbfileorga;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
-public class Record {
+public class Record implements Comparable{
 	
 	public final static char ATTDEL = ';';
 
@@ -75,5 +76,27 @@ public class Record {
 		return count;
 	}
 
-		
+	@Override
+	public boolean equals(Object o) {
+		// Identisch check
+		if (this == o)
+			return true;
+		// null check
+		if (o == null)
+			return false;
+		// Klassen check und cast
+		if (getClass() != o.getClass())
+			return false;
+		Record record = (Record) o;
+		// gleichheit check
+		return record.toString().equalsIgnoreCase(this.toString());
+	}
+
+	//Vergleiche zwei Records nach mitgliedsnummer
+	@Override
+	public int compareTo(Object o) {
+		Record a=(Record) o;
+		int i=Integer.parseInt(getAttribute(1)) - Integer.parseInt(a.getAttribute(1));
+		return i;
+	}
 }

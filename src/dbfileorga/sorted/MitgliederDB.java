@@ -13,36 +13,32 @@ public class MitgliederDB implements Iterable<Record>
 	protected DBBlock db[] = new DBBlock[8];
 
 
-	public MitgliederDB(boolean ordered){
-		this();
-		insertMitgliederIntoDB(ordered);
-
-	}
 	public MitgliederDB(){
 		initDB();
+		insertMitgliederIntoDB();
 	}
-	
+
 	private void initDB() {
 		for (int i = 0; i<db.length; ++i){
 			db[i]= new DBBlock();
 		}
 		
 	}
-	private void insertMitgliederIntoDB(boolean ordered) {
+	public DBBlock[] getDBBlock(){
+		return db;
+	}
+
+	private void insertMitgliederIntoDB() {
 		MitgliederTableAsArray mitglieder = new MitgliederTableAsArray();
 		String mitgliederDatasets[];
-		if (ordered){
-			mitgliederDatasets = mitglieder.recordsOrdered;
-		}else{
-			mitgliederDatasets = mitglieder.records;
-		}
+		mitgliederDatasets = mitglieder.recordsOrdered;
 		for (String currRecord : mitgliederDatasets ){
 			appendRecord(new Record(currRecord));
 		}	
 	}
 
 		
-	protected int appendRecord(Record record){
+	protected int appendRecord(Record record){ //TODO insert into sorted order
 		//search for block where the record should be appended
 		int currBlock = getBlockNumOfRecord(getNumberOfRecords());
 		int result = db[currBlock].insertRecordAtTheEnd(record);
@@ -105,12 +101,12 @@ public class MitgliederDB implements Iterable<Record>
 	 * @param recNum the term to search for
 	 * @return the record matching the search term
 	 */
-	public Record read(int recNum){
+	public Record read(int recNum){  //lineare Suche
 		if (recNum < 0 || recNum > this.getNumberOfRecords()) { //ungültige Eingaben werden nicht angenommen
 			return null;
 		}
 		for (Record record : this) { //geht anhand des Iterators die DB durch
-			if (recNum<=0) { //recNum bedeutet wie viele Schritte weiter gegangen werden muss
+			if (recNum==0) { //recNum bedeutet wie viele Schritte weiter gegangen werden muss
 				return record; //falls recNum==0 also keine schritte weiter, wird der aktuelle record ausgegeben
 			}
 			recNum--; //durch das "einen Schritt weitergehen" verringert sich recNum um eins
@@ -124,25 +120,48 @@ public class MitgliederDB implements Iterable<Record>
 	 */
 	public int findPos(String searchTerm){
 		int positionCounter = 0; //aktuelle position wird auf 0 gesetzt
-
 		for (Record record : this) { //DB wird anhand des Iterators durchgegangen
 			if (record.toString().contains(searchTerm)) { //beinhaltet der aktuelle record den Suchbegriff
 				return positionCounter; //wird die aktuelle position ausgegeben
 			}
 			positionCounter++; //ansonsten wird ein Schritt weitergegangen
 		}
-
 		return -1;
 	}
-	
+	/**
+	 * Returns the number of the first record that matches the search for Mitgliedsnummer
+	 * @param searchNumber the term to search for
+	 * @return the number of the record in the DB -1 if not found
+	 */
+	public int findPos(int searchNumber){
+		int positionCounter = 0; //aktuelle position wird auf 0 gesetzt
+
+		for (Record record : this) { //DB wird anhand des Iterators durchgegangen
+			if (Integer.parseInt(record.getAttribute(1))==searchNumber) { //beinhaltet der aktuelle record die Mitgliedsnummer
+				return positionCounter; //wird die aktuelle position ausgegeben
+			}
+			positionCounter++; //ansonsten wird ein Schritt weitergegangen
+		}
+		return -1;
+	}
 	/**
 	 * Inserts the record into the file and returns the record number
-	 * @param record
+	 * @param newRecord
 	 * @return the record number of the inserted record
 	 */
-	public int insert(Record record){
-		//TODO implement
-		return -1;
+	public int insert(Record newRecord){
+		MitgliederDB mitgliederDBTemp=new MitgliederDB(); //eine neue DB wird aufgesetzt
+		mitgliederDBTemp.initDB(); //die neue Datenbank wird normal mit den Mitgliedern gefüllt, real würde man das deaktivieren, hier wird einfach alles gelöscht
+		boolean added=false;
+		for (Record record : this) { //DB wird anhand des Iterators durchgegangen
+			if(newRecord.compareTo(record)<=0 && (!added)){ //An die Stelle an die der neue Record eingefügt werden muss
+				mitgliederDBTemp.appendRecord(newRecord); //wird er eingefügt
+				added=true;
+			}
+			mitgliederDBTemp.appendRecord(record);//alle Einträge aus der alten DB werden in die Neue übertragen
+		}
+		db=mitgliederDBTemp.getDBBlock(); //die alte DB wird mit der neuen Überschrieben
+		return findPos(newRecord.getAttribute(1)); //die Position wird returned
 	}
 	
 	/**
@@ -150,7 +169,15 @@ public class MitgliederDB implements Iterable<Record>
 	 * @param numRecord number of the record to be deleted
 	 */
 	public void delete(int numRecord){
-		//TODO implement
+		MitgliederDB mitgliederDBTemp=new MitgliederDB(); //eine neue DB wird aufgesetzt
+		mitgliederDBTemp.initDB(); //die neue Datenbank wird normal mit den Mitgliedern gefüllt, real würde man das deaktivieren, hier wird einfach alles gelöscht
+		for (Record record : this) { //DB wird anhand des Iterators durchgegangen
+			if(numRecord!=0) { //der zu löschende Eintrag wird ausgelassen
+				mitgliederDBTemp.appendRecord(record);//alle Einträge aus der alten DB werden in die Neue übertragen
+			}
+			numRecord--; // wird runtergezählt
+			}
+		db = mitgliederDBTemp.getDBBlock(); //die alte DB wird mit der neuen Überschrieben
 	}
 	
 	/**
@@ -160,7 +187,8 @@ public class MitgliederDB implements Iterable<Record>
 	 * 
 	 */
 	public void modify(int numRecord, Record record){
-		//TODO
+		delete(numRecord);
+		insert(record);
 	}
 
 	
@@ -177,7 +205,7 @@ public class MitgliederDB implements Iterable<Record>
 	        public boolean hasNext() {
 	            if (currBlockIter.hasNext()){
 	                return true;
-	            }else if (currBlock < db.length){ //continue search in the next block
+	            }else if (currBlock < db.length-1){ //continue search in the next block
 	            	return db[currBlock+1].iterator().hasNext();
 	            }else{ 
 	                return false;

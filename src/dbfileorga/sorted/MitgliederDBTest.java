@@ -13,12 +13,12 @@ import static org.junit.Assert.assertFalse;
 
 public class MitgliederDBTest {
 
-	MitgliederDB db = new MitgliederDB(true);
+	MitgliederDB db = new MitgliederDB();
 	MitgliederTableAsArray RecordArray = new MitgliederTableAsArray();
 	
 	@Before
 	public void setUp() throws Exception {
-		db = new MitgliederDB(false);
+		db = new MitgliederDB();
     }
 	
 	@Test
