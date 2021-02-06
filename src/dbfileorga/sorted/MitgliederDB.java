@@ -38,7 +38,7 @@ public class MitgliederDB implements Iterable<Record>
 	}
 
 		
-	protected int appendRecord(Record record){ //TODO insert into sorted order
+	protected int appendRecord(Record record){
 		//search for block where the record should be appended
 		int currBlock = getBlockNumOfRecord(getNumberOfRecords());
 		int result = db[currBlock].insertRecordAtTheEnd(record);

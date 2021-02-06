@@ -131,7 +131,6 @@ public class MitgliederDB implements Iterable<Record>
 	 */
 	public int findPos(int searchNumber){
 		int positionCounter = 0; //aktuelle position wird auf 0 gesetzt
-
 		for (Record record : this) { //DB wird anhand des Iterators durchgegangen
 			if (Integer.parseInt(record.getAttribute(1))==searchNumber) { //beinhaltet der aktuelle record die Mitgliedsnummer
 				return positionCounter; //wird die aktuelle position ausgegeben
