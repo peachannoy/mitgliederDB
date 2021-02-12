@@ -9,6 +9,11 @@ public class StartMitgliederDB {
 			Record rec;
 			System.out.println("Ausgabe der Anfangsdatenbank-----------------------------------------");
 			System.out.println(db);
+
+			System.out.println("Mitgliedsnummer 71, Eintrag löschen----------------------------");
+			db.delete(db.findPos(121));
+		System.out.println(db);
+
 /*
 			//read the a record number e.g. 31 (86;3;13;Brutt;Jasmin;12.12.04;01.01.16;;7,5)
 			rec = db.read(31);
@@ -33,11 +38,13 @@ public class StartMitgliederDB {
 			System.out.println("Steffi Brahms zu Steffi Bach------------------------------------------");
 			db.modify(db.findPos(95), new Record("95;3;13;Bach;Steffi;04.04.06;01.02.16;;5"));
 			System.out.println(db);
-*/
+
 			//delete the record with Mitgliedsnummer 71
 			System.out.println("Mitgliedsnummer 71, Eintrag löschen----------------------------");
 			db.delete(db.findPos(71));
 			System.out.println(db);
+
+ */
 	}
 
 }

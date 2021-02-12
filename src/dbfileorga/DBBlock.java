@@ -16,7 +16,7 @@ public class DBBlock implements Iterable<Record> {
 	 * @param  recNum is the number of Record 1 = first record
 	 * @return record with the specified number or null if record was not found 
 	 */
-	public Record getRecord(int recNum){
+	public Record getRecord(int recNum){ //3
 		int currRecNum = 1; //first Record starts at 0
 		for (int i = 0; i <block.length;++i){
 			if (currRecNum == recNum){
@@ -39,7 +39,7 @@ public class DBBlock implements Iterable<Record> {
 		}
 	}
 
-	private int getEndPosOfRecord(int startPos){
+	public int getEndPosOfRecord(int startPos){
 		int currPos = startPos;
 		while( currPos < block.length ){
 			if (block[currPos]==RECDEL){
@@ -49,6 +49,18 @@ public class DBBlock implements Iterable<Record> {
 			}
 		}
 		return -1;
+	}
+
+	public int getStartingPosition(int numberRecord) {
+		int currPos = 0;
+		numberRecord--;
+		while (numberRecord > 0) {
+			if (block[currPos] == RECDEL) {
+				numberRecord--;
+			}
+			currPos++;
+		}
+		return currPos;
 	}
 	
 	
@@ -65,6 +77,7 @@ public class DBBlock implements Iterable<Record> {
 		}
 		return count;
 	}
+
 	
 	/**
 	 * Inserts an record at the end of the block
@@ -92,7 +105,7 @@ public class DBBlock implements Iterable<Record> {
 	 * @return returns the last position (the position of the RECDEL char) of the inserted record 
 	 * 		   returns -1 if the insert fails
 	 */	
-	private int insertRecordAtPos(int startPos, Record record) {
+	public int insertRecordAtPos(int startPos, Record record) {
 		//we need to insert the record plus the RECDEL 
 		int n = record.length();
 		if (startPos+n+1 > block.length){
@@ -105,6 +118,18 @@ public class DBBlock implements Iterable<Record> {
 		return n+startPos;
 	}
 
+	//Copies everything from "from" to "to"
+	public void pullForward(int from, int to){
+		while(to<BLOCKSIZE){
+			if(from<BLOCKSIZE) {
+				block[to] = block[from];
+			}else{
+				block[to]=DEFCHAR;
+			}
+			from++;
+			to++;
+		}
+	}
 	
 
 

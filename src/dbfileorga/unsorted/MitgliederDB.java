@@ -4,6 +4,7 @@ import dbfileorga.DBBlock;
 import dbfileorga.MitgliederTableAsArray;
 import dbfileorga.Record;
 
+import java.sql.SQLOutput;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -154,28 +155,35 @@ public class MitgliederDB implements Iterable<Record>
 	 * Deletes the record specified 
 	 * @param numRecord number of the record to be deleted
 	 */
-	public void delete(int numRecord){
-		int blockNumberWithRecord=0;
-		int recCounter = 0; //getBlockNumOfRecord wird nicht verwendet: diese Methode ist so gedacht, dass sie bei Überlauf, also ein 6. Record, noch den alten Block ausgibt. Für diesen Fall nicht geeignet
-		for (int i = 0; i< db.length; ++i){ //suche den Block mit dem enthaltenen Record raus
-			if (numRecord < (recCounter+db[i].getNumberOfRecords())){
-				blockNumberWithRecord=i;
-				break;
+	public void delete(int numRecord){ //5
+		int currNumRecord= numRecord+1; //da es bei null anfängt, für die berechnung aber bei 1 einfangen muss
+		//Block finden wo der record ist
+		for(int i=0;i<db.length;i++){ //TODO daraus ne while schleife?
+			if(currNumRecord<=db[i].getNumberOfRecords()){
+				//Die nachfolgenden Records werden einfach vorgezogen
+				int a=db[i].getStartingPosition((currNumRecord+1));
+				int b=db[i].getStartingPosition(currNumRecord);
+				db[i].pullForward(a,b);
+				//nächste Blöcke vorziehen
+				if(i<db.length-2) {
+					int result = db[i].insertRecordAtTheEnd(db[i + 1].getRecord(1));
+					if (result != -1) { //insert was successful
+						int z = 0;
+						for (int y = 0; y <= i; y++)
+							z = z + db[y].getNumberOfRecords(); //Nummer des ersten Records im nächsten Block rausfinden
+						if (z + db[i + 1].getNumberOfRecords() <= getNumberOfRecords()){
+							delete(z);
+						}
+					}
+				}
+				return;
 			}else{
-				recCounter += db[i].getNumberOfRecords();
+				currNumRecord=currNumRecord-db[i].getNumberOfRecords();
 			}
 		}
-		DBBlock temp=db[blockNumberWithRecord]; //Block wird zwischengespeichert
-		Record oldRecord=read(numRecord);
-		for(int i=blockNumberWithRecord; i<7 ;i++){
-			db[i]=db[i+1]; //Alle Blöcke werden um eins nach vorne verschoben
-		}
-		db[7]=new DBBlock(); //der letzte Block wäre doppelt muss also überschrieben werden
-		for(Record record : temp){
-			if(!record.equals(oldRecord)){ //alle Einträge aus dem alten Block werden einzeln wieder eingefügt, so werden Lücken gefüllt
-				insert(record); 			//außer der gesuchte Record
-			}
-		}
+
+
+
 	}
 	
 	/**
