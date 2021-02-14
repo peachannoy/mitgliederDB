@@ -92,7 +92,8 @@ public class MitgliederDB implements Iterable<Record>
 	 * Returns the number of the given record number within its block starting from 1
 	 * @param numRecord the record number to search for
 	 * @return the inner number or -1 if record is not found
-	 */	public int getInnerNumber(int numRecord){
+	 */
+	private int getInnerNumber(int numRecord){
 		int currentRecordCount;
 		for(int i=0;i<db.length;i++){
 			currentRecordCount=db[i].getNumberOfRecords();
@@ -111,7 +112,7 @@ public class MitgliederDB implements Iterable<Record>
 	 * @param recNum the term to search for
 	 * @return the record matching the search term
 	 */
-	public Record read(int recNum){  //lineare Suche
+	public Record read(int recNum){
 		if (recNum < 0 || recNum > this.getNumberOfRecords()) { //ungültige Eingaben werden nicht angenommen
 			return null;
 		}
@@ -141,7 +142,7 @@ public class MitgliederDB implements Iterable<Record>
 		return -1;
 	}
 	public int findPos(String searchNumber){return findPos(Integer.parseInt(searchNumber));}
-
+	
 	/**
 	 * Inserts the record into the file and returns the record number
 	 * @param newRecord
@@ -203,7 +204,7 @@ public class MitgliederDB implements Iterable<Record>
 	 * @param numRecord number of the record within the block to be deleted
 	 * @param blockNumber the block with the record to be deleted
 	 */
-	public void deleteFromBlock(int blockNumber, int numRecord){
+	private void deleteFromBlock(int blockNumber, int numRecord){
 		if(numRecord!=db[blockNumber].getNumberOfRecords()) { //Record nicht am Ende
 			db[blockNumber].pullForward(db[blockNumber].getStartingPosition((numRecord + 1)), db[blockNumber].getStartingPosition(numRecord));
 		}else{
@@ -221,7 +222,7 @@ public class MitgliederDB implements Iterable<Record>
 	 * @param numRecord number of the record within the block to be deleted
 	 * @param blockNumber the block with the record to be deleted
 	 */
-	public void deleteNoDefrag(int blockNumber, int numRecord){
+	private void deleteNoDefrag(int blockNumber, int numRecord){
 		if(numRecord!=db[blockNumber].getNumberOfRecords()) { //Record nicht am Ende
 			db[blockNumber].pullForward(db[blockNumber].getStartingPosition((numRecord + 1)), db[blockNumber].getStartingPosition(numRecord));
 		}else{
