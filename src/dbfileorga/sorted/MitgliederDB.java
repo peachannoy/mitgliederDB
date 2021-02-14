@@ -36,6 +36,9 @@ public class MitgliederDB implements Iterable<Record>
 
 		
 	protected int appendRecord(Record record){
+		if (record==null) { //ungültige Eingaben werden nicht angenommen
+			return -1;
+		}
 		//search for block where the record should be appended
 		int currBlock = getBlockNumOfRecord(getNumberOfRecords()-1);
 		int result = db[currBlock].insertRecordAtTheEnd(record);
@@ -77,6 +80,9 @@ public class MitgliederDB implements Iterable<Record>
 	 * @return the block number or -1 if record is not found
 	 */
 	public int getBlockNumOfRecord(int recNum){
+		if (recNum < 0 || recNum >= getNumberOfRecords()) { //ungültige Eingaben werden nicht angenommen
+			return -1;
+		}
 		int recCounter = 0;
 		for (int i = 0; i< db.length; ++i){
 			if (recNum <= (recCounter+db[i].getNumberOfRecords())){
@@ -113,7 +119,7 @@ public class MitgliederDB implements Iterable<Record>
 	 * @return the record matching the search term
 	 */
 	public Record read(int recNum){
-		if (recNum < 0 || recNum > this.getNumberOfRecords()) { //ungültige Eingaben werden nicht angenommen
+		if (recNum < 0 || recNum >= getNumberOfRecords()) { //ungültige Eingaben werden nicht angenommen
 			return null;
 		}
 		for (Record record : this) { //geht anhand des Iterators die DB durch
@@ -131,6 +137,9 @@ public class MitgliederDB implements Iterable<Record>
 	 * @return the number of the record in the DB -1 if not found
 	 */
 	public int findPos(int searchNumber){
+		if (searchNumber<=0) { //ungültige Eingaben werden nicht angenommen
+			return -1;
+		}
 		int positionCounter = 0; //aktuelle position wird auf 0 gesetzt
 
 		for (Record record : this) { //DB wird anhand des Iterators durchgegangen
@@ -142,13 +151,16 @@ public class MitgliederDB implements Iterable<Record>
 		return -1;
 	}
 	public int findPos(String searchNumber){return findPos(Integer.parseInt(searchNumber));}
-	
+
 	/**
 	 * Inserts the record into the file and returns the record number
 	 * @param newRecord
 	 * @return the record number of the inserted record
 	 */
 	public int insert(Record newRecord){
+		if(newRecord==null){
+			return -1;
+		}
 		int[] location=insertBefore(newRecord); //find the location of the new record
 		if(location==null){ //If the record would be at the end, no location is returned
 			appendRecord(newRecord); //so just append it
@@ -177,7 +189,7 @@ public class MitgliederDB implements Iterable<Record>
 	 * @param record the new record
 	 * @return the new record would be inserted BEFORE the returned record number
 	 */
-	public int[] insertBefore(Record record){
+	private int[] insertBefore(Record record){
 		for(int i=0; i<db.length ;i++) { //Search in all blocks
 			for (int y = 1; y <= db[i].getNumberOfRecords(); y++) { //Search in all records
 				if(record.compareTo(db[i].getRecord(y))<=0 ){
@@ -196,6 +208,9 @@ public class MitgliederDB implements Iterable<Record>
 	 * @param numRecord number of the record to be deleted
 	 */
 	public void delete(int numRecord){
+		if (numRecord < 0 || numRecord >= getNumberOfRecords()) { //ungültige Eingaben werden nicht angenommen
+			return;
+		}
 		deleteFromBlock(getBlockNumOfRecord(numRecord+1), getInnerNumber(numRecord));
 	}
 
