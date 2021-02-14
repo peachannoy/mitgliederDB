@@ -24,9 +24,6 @@ public class MitgliederDB implements Iterable<Record>
 		}
 		
 	}
-	public DBBlock[] getDBBlock(){
-		return db;
-	}
 
 	private void insertMitgliederIntoDB() {
 		MitgliederTableAsArray mitglieder = new MitgliederTableAsArray();
@@ -40,11 +37,11 @@ public class MitgliederDB implements Iterable<Record>
 		
 	protected int appendRecord(Record record){
 		//search for block where the record should be appended
-		int currBlock = getBlockNumOfRecord(getNumberOfRecords());
+		int currBlock = getBlockNumOfRecord(getNumberOfRecords()-1);
 		int result = db[currBlock].insertRecordAtTheEnd(record);
 		if (result != -1 ){ //insert was successful
 			return result;
-		}else if (currBlock < db.length) { // overflow => insert the record into the next block
+		}else if (currBlock < db.length-1) { // overflow => insert the record into the next block
 			return db[currBlock+1].insertRecordAtTheEnd(record);
 		}
 		return -1;
@@ -90,9 +87,22 @@ public class MitgliederDB implements Iterable<Record>
 		}
 		return -1;
 	}
-		
-	public DBBlock getBlock(int i){
-		return db[i];
+
+	/**
+	 * Returns the number of the given record number within its block starting from 1
+	 * @param numRecord the record number to search for
+	 * @return the inner number or -1 if record is not found
+	 */	public int getInnerNumber(int numRecord){
+		int currentRecordCount;
+		for(int i=0;i<db.length;i++){
+			currentRecordCount=db[i].getNumberOfRecords();
+			if(numRecord<currentRecordCount){
+				return numRecord+1;
+			}else{
+				numRecord-=currentRecordCount;
+			}
+		}
+		return -1;
 	}
 	
 	
@@ -113,21 +123,7 @@ public class MitgliederDB implements Iterable<Record>
 		}
 		return null;
 	}
-	/**
-	 * Returns the number of the first record that matches the search term
-	 * @param searchTerm the term to search for
-	 * @return the number of the record in the DB -1 if not found
-	 */
-	public int findPos(String searchTerm){
-		int positionCounter = 0; //aktuelle position wird auf 0 gesetzt
-		for (Record record : this) { //DB wird anhand des Iterators durchgegangen
-			if (record.toString().contains(searchTerm)) { //beinhaltet der aktuelle record den Suchbegriff
-				return positionCounter; //wird die aktuelle position ausgegeben
-			}
-			positionCounter++; //ansonsten wird ein Schritt weitergegangen
-		}
-		return -1;
-	}
+
 	/**
 	 * Returns the number of the first record that matches the search for Mitgliedsnummer
 	 * @param searchNumber the term to search for
@@ -144,56 +140,54 @@ public class MitgliederDB implements Iterable<Record>
 		}
 		return -1;
 	}
+	public int findPos(String searchNumber){return findPos(Integer.parseInt(searchNumber));}
+
 	/**
 	 * Inserts the record into the file and returns the record number
 	 * @param newRecord
 	 * @return the record number of the inserted record
 	 */
 	public int insert(Record newRecord){
-		//get record length
+		int[] location=insertBefore(newRecord); //find the location of the new record
+		if(location==null){ //If the record would be at the end, no location is returned
+			appendRecord(newRecord); //so just append it
+			return getNumberOfRecords()-1;
+		}
+		int blockNumber=location[0];
+		int innerBlockNumber=location[1];
+		Record overflowRecord=null;
 		int length=newRecord.length();
-		//find block to enter
-		for(int i=0; i<db.length ;i++){ //Blöcke durchgehen
-			for(int y=1; y<db[i].getNumberOfRecords();y++) { //Records durchgehen
-				if(newRecord.compareTo(db[i].getRecord(y))<=0 ){
-					Record overflowRecord=null;
-					//compare to left space
-					if(db[i].leftSpace()<=length){ //es muss noch das recdel reinpassen, deswegen auch =
-						//if not enough delete last record
-						int overflowRecordNumber=db[i].getNumberOfRecords();
-						overflowRecord=db[i].getRecord(overflowRecordNumber);
-						deleteFromBlock(i,overflowRecordNumber);
-					}
-					//insert the actual record
-					db[i].insertPushingBack(newRecord, y);
-					//insert the deleted record
-					if(overflowRecord!=null)
-					insert(overflowRecord);
+		//compare to left space
+		if(db[blockNumber].leftSpace()<=length){ //<=because the RECDEL has to fit in
+			int overflowRecordNumber=db[blockNumber].getNumberOfRecords(); //if not enough delete last record
+			overflowRecord=db[blockNumber].getRecord(overflowRecordNumber);
+			deleteNoDefrag(blockNumber , overflowRecordNumber);
+		}
+		//insert the actual record
+		db[blockNumber].insertPushingBack(newRecord, innerBlockNumber);
+		//insert the deleted record
+		if(overflowRecord!=null)
+			insert(overflowRecord);
+		return innerBlockNumber; //because the new record pushes the other records back
+	}
 
-					return 0;
+	/**
+	 * Finds the position to insert the record
+	 * @param record the new record
+	 * @return the new record would be inserted BEFORE the returned record number
+	 */
+	public int[] insertBefore(Record record){
+		for(int i=0; i<db.length ;i++) { //Search in all blocks
+			for (int y = 1; y <= db[i].getNumberOfRecords(); y++) { //Search in all records
+				if(record.compareTo(db[i].getRecord(y))<=0 ){
+					int[] location=new int[2];
+					location[0]=i;
+					location[1]=y;
+					return location;
 				}
 			}
 		}
-
-		return 0;
-
-
-
-		/*
-		MitgliederDB mitgliederDBTemp=new MitgliederDB(); //eine neue DB wird aufgesetzt
-		mitgliederDBTemp.initDB(); //die neue Datenbank wird normal mit den Mitgliedern gefüllt, real würde man das deaktivieren, hier wird einfach alles gelöscht
-		boolean added=false;
-		for (Record record : this) { //DB wird anhand des Iterators durchgegangen
-			if(newRecord.compareTo(record)<=0 && (!added)){ //An die Stelle an die der neue Record eingefügt werden muss
-				mitgliederDBTemp.appendRecord(newRecord); //wird er eingefügt
-				added=true;
-			}
-			mitgliederDBTemp.appendRecord(record);//alle Einträge aus der alten DB werden in die Neue übertragen
-		}
-		db=mitgliederDBTemp.getDBBlock(); //die alte DB wird mit der neuen Überschrieben
-		return findPos(newRecord.getAttribute(1)); //die Position wird returned
-
-		 */
+		return null;
 	}
 
 	/**
@@ -201,7 +195,7 @@ public class MitgliederDB implements Iterable<Record>
 	 * @param numRecord number of the record to be deleted
 	 */
 	public void delete(int numRecord){
-		deleteFromBlock(getBlockNumOfRecord(numRecord-1), numRecord);
+		deleteFromBlock(getBlockNumOfRecord(numRecord+1), getInnerNumber(numRecord));
 	}
 
 	/**
@@ -210,11 +204,28 @@ public class MitgliederDB implements Iterable<Record>
 	 * @param blockNumber the block with the record to be deleted
 	 */
 	public void deleteFromBlock(int blockNumber, int numRecord){
-		db[blockNumber].pullForward(db[blockNumber].getStartingPosition((numRecord+1)),db[blockNumber].getStartingPosition(numRecord));
-		if(blockNumber<db.length-2) {  //nächsten Blöcke vorziehen
+		if(numRecord!=db[blockNumber].getNumberOfRecords()) { //Record nicht am Ende
+			db[blockNumber].pullForward(db[blockNumber].getStartingPosition((numRecord + 1)), db[blockNumber].getStartingPosition(numRecord));
+		}else{
+			db[blockNumber].deleteLastRecord();
+		}
+		if(blockNumber<db.length-1) {  //nächsten Blöcke vorziehen
 			int result = db[blockNumber].insertRecordAtTheEnd(db[blockNumber + 1].getRecord(1));
 			if (result != -1)  //insert was successful
 				deleteFromBlock(blockNumber+1,1);
+		}
+	}
+
+	/**
+	 * Deletes the record specified from specific block WITHOUT defragmentation
+	 * @param numRecord number of the record within the block to be deleted
+	 * @param blockNumber the block with the record to be deleted
+	 */
+	public void deleteNoDefrag(int blockNumber, int numRecord){
+		if(numRecord!=db[blockNumber].getNumberOfRecords()) { //Record nicht am Ende
+			db[blockNumber].pullForward(db[blockNumber].getStartingPosition((numRecord + 1)), db[blockNumber].getStartingPosition(numRecord));
+		}else{
+			db[blockNumber].deleteLastRecord();
 		}
 	}
 	

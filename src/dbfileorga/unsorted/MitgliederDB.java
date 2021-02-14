@@ -37,7 +37,7 @@ public class MitgliederDB implements Iterable<Record>
 		
 	protected int appendRecord(Record record){
 		//search for block where the record should be appended
-		int currBlock = getBlockNumOfRecord(getNumberOfRecords());
+		int currBlock = getBlockNumOfRecord(getNumberOfRecords()-1);
 		int result = db[currBlock].insertRecordAtTheEnd(record);
 		if (result != -1 ){ //insert was successful
 			return result;
@@ -91,7 +91,20 @@ public class MitgliederDB implements Iterable<Record>
 	public DBBlock getBlock(int i){
 		return db[i];
 	}
-	
+
+	//Finds the number of the record within the Block
+	public int getInnerNumber(int numRecord){
+		int currentRecordCount;
+		for(int i=0;i<db.length;i++){
+			currentRecordCount=db[i].getNumberOfRecords();
+			if(numRecord<currentRecordCount){
+				return numRecord+1;
+			}else{
+				numRecord-=currentRecordCount;
+			}
+		}
+		return -1;
+	}
 	
 	/**
 	 * Returns the record matching the record number
@@ -126,6 +139,7 @@ public class MitgliederDB implements Iterable<Record>
 		}
 		return -1;
 	}
+	public int findPos(String searchNumber){return findPos(Integer.parseInt(searchNumber));}
 	
 	/**
 	 * Inserts the record into the file and returns the record number
@@ -142,7 +156,7 @@ public class MitgliederDB implements Iterable<Record>
 	 * @param numRecord number of the record to be deleted
 	 */
 	public void delete(int numRecord){
-		deleteFromBlock(getBlockNumOfRecord(numRecord-1), numRecord);
+		deleteFromBlock(getBlockNumOfRecord(numRecord+1), getInnerNumber(numRecord));
 	}
 
 	/**
@@ -152,7 +166,7 @@ public class MitgliederDB implements Iterable<Record>
 	 */
 	public void deleteFromBlock(int blockNumber, int numRecord){
 		db[blockNumber].pullForward(db[blockNumber].getStartingPosition((numRecord+1)),db[blockNumber].getStartingPosition(numRecord));
-		if(blockNumber<db.length-2) {  //nächsten Blöcke vorziehen
+		if(blockNumber<db.length-1) {  //nächsten Blöcke vorziehen
 			int result = db[blockNumber].insertRecordAtTheEnd(db[blockNumber + 1].getRecord(1));
 			if (result != -1)  //insert was successful
 				deleteFromBlock(blockNumber+1,1);

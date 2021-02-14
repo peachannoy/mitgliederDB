@@ -62,7 +62,11 @@ public class DBBlock implements Iterable<Record> {
 		}
 		return currPos;
 	}
-	
+
+	public void deleteLastRecord(){
+		for(int i=getStartingPosition(getNumberOfRecords());i<block.length;i++)
+			block[i]=DEFCHAR;
+	}
 	
 	/**
 	 * Returns the number of records that are in the block
@@ -86,6 +90,7 @@ public class DBBlock implements Iterable<Record> {
 	 * 		   returns -1 if the insert fails
 	 */
 	public int insertRecordAtTheEnd(Record record){
+		if(record==null) return -1;
 		int startPos = findEmptySpace();
 		return insertRecordAtPos(startPos, record);
 	}
@@ -120,15 +125,16 @@ public class DBBlock implements Iterable<Record> {
 
 	public void insertPushingBack(Record record, int beforeRecord){
 		//pushes the following records back
-		int until=getStartingPosition(beforeRecord);
-		for(int i=block.length-1;i>until;i--){ //TODO Das passt alles noch net so ganz
-			block[i]=block[i-1];
+		int neededSpace=record.length()+1; //+1 for RECDEL
+		int startingPosition=getStartingPosition(beforeRecord);
+		for(int i=block.length-1;(i>=startingPosition&&i>=neededSpace);i--) {
+			block[i] = block[i - neededSpace];
 		}
 		//inserts the record
-		int startingPosition=until-record.length();
 		for(int i=0;i<record.length();i++){
 			block[i+startingPosition]=record.charAt(i);
 		}
+		block[startingPosition+record.length()]=RECDEL;
 	}
 
 	//Copies everything from "from" to "to"
