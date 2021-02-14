@@ -16,7 +16,7 @@ public class DBBlock implements Iterable<Record> {
 	 * @param  recNum is the number of Record 1 = first record
 	 * @return record with the specified number or null if record was not found 
 	 */
-	public Record getRecord(int recNum){ //3
+	public Record getRecord(int recNum){
 		int currRecNum = 1; //first Record starts at 0
 		for (int i = 0; i <block.length;++i){
 			if (currRecNum == recNum){
@@ -118,6 +118,19 @@ public class DBBlock implements Iterable<Record> {
 		return n+startPos;
 	}
 
+	public void insertPushingBack(Record record, int beforeRecord){
+		//pushes the following records back
+		int until=getStartingPosition(beforeRecord);
+		for(int i=block.length-1;i>until;i--){ //TODO Das passt alles noch net so ganz
+			block[i]=block[i-1];
+		}
+		//inserts the record
+		int startingPosition=until-record.length();
+		for(int i=0;i<record.length();i++){
+			block[i+startingPosition]=record.charAt(i);
+		}
+	}
+
 	//Copies everything from "from" to "to"
 	public void pullForward(int from, int to){
 		while(to<BLOCKSIZE){
@@ -132,6 +145,15 @@ public class DBBlock implements Iterable<Record> {
 	}
 	
 
+	public int leftSpace(){
+		int numSpaces=0;
+		for (int i = 0; i <block.length;++i){
+			if (block[i] == DEFCHAR){
+				numSpaces++;
+			}
+		}
+		return numSpaces;
+	}
 
 	private int findEmptySpace(){
 		for (int i = 0; i <block.length;++i){

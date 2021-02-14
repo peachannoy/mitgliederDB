@@ -150,6 +150,36 @@ public class MitgliederDB implements Iterable<Record>
 	 * @return the record number of the inserted record
 	 */
 	public int insert(Record newRecord){
+		//get record length
+		int length=newRecord.length();
+		//find block to enter
+		for(int i=0; i<db.length ;i++){ //Blöcke durchgehen
+			for(int y=1; y<db[i].getNumberOfRecords();y++) { //Records durchgehen
+				if(newRecord.compareTo(db[i].getRecord(y))<=0 ){
+					Record overflowRecord=null;
+					//compare to left space
+					if(db[i].leftSpace()<=length){ //es muss noch das recdel reinpassen, deswegen auch =
+						//if not enough delete last record
+						int overflowRecordNumber=db[i].getNumberOfRecords();
+						overflowRecord=db[i].getRecord(overflowRecordNumber);
+						deleteFromBlock(i,overflowRecordNumber);
+					}
+					//insert the actual record
+					db[i].insertPushingBack(newRecord, y);
+					//insert the deleted record
+					if(overflowRecord!=null)
+					insert(overflowRecord);
+
+					return 0;
+				}
+			}
+		}
+
+		return 0;
+
+
+
+		/*
 		MitgliederDB mitgliederDBTemp=new MitgliederDB(); //eine neue DB wird aufgesetzt
 		mitgliederDBTemp.initDB(); //die neue Datenbank wird normal mit den Mitgliedern gefüllt, real würde man das deaktivieren, hier wird einfach alles gelöscht
 		boolean added=false;
@@ -162,22 +192,30 @@ public class MitgliederDB implements Iterable<Record>
 		}
 		db=mitgliederDBTemp.getDBBlock(); //die alte DB wird mit der neuen Überschrieben
 		return findPos(newRecord.getAttribute(1)); //die Position wird returned
+
+		 */
 	}
-	
+
 	/**
 	 * Deletes the record specified 
 	 * @param numRecord number of the record to be deleted
 	 */
 	public void delete(int numRecord){
-		MitgliederDB mitgliederDBTemp=new MitgliederDB(); //eine neue DB wird aufgesetzt
-		mitgliederDBTemp.initDB(); //die neue Datenbank wird normal mit den Mitgliedern gefüllt, real würde man das deaktivieren, hier wird einfach alles gelöscht
-		for (Record record : this) { //DB wird anhand des Iterators durchgegangen
-			if(numRecord!=0) { //der zu löschende Eintrag wird ausgelassen
-				mitgliederDBTemp.appendRecord(record);//alle Einträge aus der alten DB werden in die Neue übertragen
-			}
-			numRecord--; // wird runtergezählt
-			}
-		db = mitgliederDBTemp.getDBBlock(); //die alte DB wird mit der neuen Überschrieben
+		deleteFromBlock(getBlockNumOfRecord(numRecord-1), numRecord);
+	}
+
+	/**
+	 * Deletes the record specified from specific block
+	 * @param numRecord number of the record within the block to be deleted
+	 * @param blockNumber the block with the record to be deleted
+	 */
+	public void deleteFromBlock(int blockNumber, int numRecord){
+		db[blockNumber].pullForward(db[blockNumber].getStartingPosition((numRecord+1)),db[blockNumber].getStartingPosition(numRecord));
+		if(blockNumber<db.length-2) {  //nächsten Blöcke vorziehen
+			int result = db[blockNumber].insertRecordAtTheEnd(db[blockNumber + 1].getRecord(1));
+			if (result != -1)  //insert was successful
+				deleteFromBlock(blockNumber+1,1);
+		}
 	}
 	
 	/**

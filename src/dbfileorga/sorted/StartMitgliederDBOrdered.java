@@ -7,9 +7,11 @@ public class StartMitgliederDBOrdered {
 	public static void main(String[] args) {
 			MitgliederDB db = new MitgliederDB();
 
-			System.out.println(db);
+		db.insert(new Record("122;2;44;Meier;Hans;07.05.01;01.03.10;120;15"));
+		System.out.println(db);
+		//System.out.println(db);
 			
-
+/*
 			// read the a record number e.g. 32 (121;4;;Meller;Peter;24.08.64;01.03.04;230;25)
 			Record rec = db.read(32);
 			System.out.println(rec);
@@ -29,6 +31,8 @@ public class StartMitgliederDBOrdered {
 			//delete the record with Mitgliedsnummer 121 (121;4;;Meller;Peter;24.08.64;01.03.04;230;25) 
 			db.delete(db.findPos(121));
 			System.out.println(db);
+
+ */
 
 	}
 

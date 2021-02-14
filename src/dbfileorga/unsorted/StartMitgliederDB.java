@@ -5,13 +5,14 @@ import dbfileorga.Record;
 public class StartMitgliederDB {
 
 	public static void main(String[] args) {
+
 			MitgliederDB db = new MitgliederDB();
 			Record rec;
 			System.out.println("Ausgabe der Anfangsdatenbank-----------------------------------------");
 			System.out.println(db);
 
 			System.out.println("Mitgliedsnummer 71, Eintrag löschen----------------------------");
-			db.delete(db.findPos(121));
+			//db.delete(db.findPos(71));
 		System.out.println(db);
 
 /*

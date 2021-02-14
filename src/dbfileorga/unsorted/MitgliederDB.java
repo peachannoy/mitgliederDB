@@ -110,21 +110,7 @@ public class MitgliederDB implements Iterable<Record>
 		}
 		return null;
 	}
-	/**
-	 * Returns the number of the first record that matches the search term
-	 * @param searchTerm the term to search for
-	 * @return the number of the record in the DB -1 if not found
-	 */
-	public int findPos(String searchTerm){
-		int positionCounter = 0; //aktuelle position wird auf 0 gesetzt
-		for (Record record : this) { //DB wird anhand des Iterators durchgegangen
-			if (record.toString().contains(searchTerm)) { //beinhaltet der aktuelle record den Suchbegriff
-				return positionCounter; //wird die aktuelle position ausgegeben
-			}
-			positionCounter++; //ansonsten wird ein Schritt weitergegangen
-		}
-		return -1;
-	}
+
 	/**
 	 * Returns the number of the first record that matches the search for Mitgliedsnummer
 	 * @param searchNumber the term to search for
@@ -155,35 +141,22 @@ public class MitgliederDB implements Iterable<Record>
 	 * Deletes the record specified 
 	 * @param numRecord number of the record to be deleted
 	 */
-	public void delete(int numRecord){ //5
-		int currNumRecord= numRecord+1; //da es bei null anfängt, für die berechnung aber bei 1 einfangen muss
-		//Block finden wo der record ist
-		for(int i=0;i<db.length;i++){ //TODO daraus ne while schleife?
-			if(currNumRecord<=db[i].getNumberOfRecords()){
-				//Die nachfolgenden Records werden einfach vorgezogen
-				int a=db[i].getStartingPosition((currNumRecord+1));
-				int b=db[i].getStartingPosition(currNumRecord);
-				db[i].pullForward(a,b);
-				//nächste Blöcke vorziehen
-				if(i<db.length-2) {
-					int result = db[i].insertRecordAtTheEnd(db[i + 1].getRecord(1));
-					if (result != -1) { //insert was successful
-						int z = 0;
-						for (int y = 0; y <= i; y++)
-							z = z + db[y].getNumberOfRecords(); //Nummer des ersten Records im nächsten Block rausfinden
-						if (z + db[i + 1].getNumberOfRecords() <= getNumberOfRecords()){
-							delete(z);
-						}
-					}
-				}
-				return;
-			}else{
-				currNumRecord=currNumRecord-db[i].getNumberOfRecords();
-			}
+	public void delete(int numRecord){
+		deleteFromBlock(getBlockNumOfRecord(numRecord-1), numRecord);
+	}
+
+	/**
+	 * Deletes the record specified from specific block
+	 * @param numRecord number of the record within the block to be deleted
+	 * @param blockNumber the block with the record to be deleted
+	 */
+	public void deleteFromBlock(int blockNumber, int numRecord){
+		db[blockNumber].pullForward(db[blockNumber].getStartingPosition((numRecord+1)),db[blockNumber].getStartingPosition(numRecord));
+		if(blockNumber<db.length-2) {  //nächsten Blöcke vorziehen
+			int result = db[blockNumber].insertRecordAtTheEnd(db[blockNumber + 1].getRecord(1));
+			if (result != -1)  //insert was successful
+				deleteFromBlock(blockNumber+1,1);
 		}
-
-
-
 	}
 	
 	/**
